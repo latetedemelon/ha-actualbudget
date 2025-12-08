@@ -7,9 +7,8 @@ import voluptuous as vol
 from urllib.parse import urlparse
 
 from homeassistant import config_entries
-from homeassistant.helpers.selector import selector
 
-from .actualbudget import ActualBudget
+from .actual import ActualAPI
 from .const import (
     DOMAIN,
     CONFIG_ENDPOINT,
@@ -17,22 +16,21 @@ from .const import (
     CONFIG_FILE,
     CONFIG_CERT,
     CONFIG_ENCRYPT_PASSWORD,
+    CONFIG_CURRENCY,
+    # Legacy for backward compatibility
     CONFIG_UNIT,
-    CONFIG_PREFIX,
 )
 
 _LOGGER = logging.getLogger(__name__)
-_LOGGER.setLevel(logging.DEBUG)
 
 DATA_SCHEMA = vol.Schema(
     {
         vol.Required(CONFIG_ENDPOINT): str,
         vol.Required(CONFIG_PASSWORD): str,
         vol.Required(CONFIG_FILE): str,
-        vol.Required(CONFIG_UNIT, default="€"): str,
+        vol.Required(CONFIG_CURRENCY, default="€"): str,
         vol.Optional(CONFIG_CERT): str,
         vol.Optional(CONFIG_ENCRYPT_PASSWORD): str,
-        vol.Optional(CONFIG_PREFIX, default="actualbudget"): str,
     }
 )
 
@@ -50,19 +48,21 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if user_input is None:
             return self.async_show_form(step_id="user", data_schema=DATA_SCHEMA)
 
-        unique_id = (
-            user_input[CONFIG_ENDPOINT].lower() + "_" + user_input[CONFIG_FILE].lower()
-        )
         endpoint = user_input[CONFIG_ENDPOINT]
-        domain = urlparse(endpoint).hostname
-        port = urlparse(endpoint).port
         password = user_input[CONFIG_PASSWORD]
         file = user_input[CONFIG_FILE]
         cert = user_input.get(CONFIG_CERT)
         encrypt_password = user_input.get(CONFIG_ENCRYPT_PASSWORD)
+        
+        # Handle legacy CONFIG_UNIT by converting to CONFIG_CURRENCY
+        if CONFIG_UNIT in user_input and CONFIG_CURRENCY not in user_input:
+            user_input[CONFIG_CURRENCY] = user_input[CONFIG_UNIT]
+        
         if cert == "SKIP":
             cert = False
 
+        # Use file ID as unique identifier
+        unique_id = file.lower()
         await self.async_set_unique_id(unique_id)
         self._abort_if_unique_id_configured()
 
@@ -74,12 +74,14 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 step_id="user", data_schema=DATA_SCHEMA, errors={"base": error}
             )
         else:
+            domain = urlparse(endpoint).hostname
+            port = urlparse(endpoint).port
             return self.async_create_entry(
                 title=f"{domain}:{port} {file}",
                 data=user_input,
             )
 
     async def _test_connection(self, endpoint, password, file, cert, encrypt_password):
-        """Return true if gas station exists."""
-        api = ActualBudget(self.hass, endpoint, password, file, cert, encrypt_password)
+        """Test the connection to Actual Budget."""
+        api = ActualAPI(self.hass, endpoint, password, file, cert, encrypt_password)
         return await api.test_connection()

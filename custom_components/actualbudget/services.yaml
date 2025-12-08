@@ -1,0 +1,17 @@
+# Services for Actual Budget integration
+
+get_transactions:
+  name: Get Transactions
+  description: Get all transactions from Actual Budget
+
+create_splits:
+  name: Create Splits
+  description: Create transaction splits in Actual Budget
+
+get_accounts:
+  name: Get Accounts
+  description: Get all accounts from Actual Budget
+
+bank_sync:
+  name: Bank Sync
+  description: Sync all accounts with bank
