@@ -1,36 +1,62 @@
 {
-  "title": "actualbudget",
+  "title": "Actual Budget",
   "config": {
     "step": {
       "user": {
         "title": "Login",
-        "description": "Entrar com suas credenciais do actualbudget",
+        "description": "Entrar com suas credenciais do Actual Budget",
         "data": {
-          "endpoint": "endpoint do actualbudget",
-          "password": "palavra-passe",
-          "encrypt_password": "palavra-passe de encriptação",
-          "file": "id do ficheiro",
-          "cert": "certificado",
-          "unit": "moeda"
+          "endpoint": "Endpoint do Actual Budget",
+          "password": "Palavra-passe",
+          "encrypt_password": "Palavra-passe de encriptação",
+          "file": "ID do ficheiro",
+          "cert": "Certificado",
+          "currency": "Moeda"
         },
         "data_description": {
-          "endpoint": "O endpoint do servidor actualbudget",
-          "password": "A palavra-passe do servidor actualbudget",
-          "encrypt_password": "A palavra-passe para encriptar o ficheiro actualbudget",
-          "file": "O id do ficheiro do servidor actualbudget",
-          "cert": "O certificado do servidor actualbudget, escreva 'SKIP' para ignorar a validação do certificado",
-          "unit": "A moeda do servidor/ficheiro actualbudget"
+          "endpoint": "O endpoint do servidor Actual Budget",
+          "password": "A palavra-passe do servidor Actual Budget",
+          "encrypt_password": "A palavra-passe para encriptar o ficheiro Actual Budget",
+          "file": "O ID do ficheiro do servidor Actual Budget",
+          "cert": "O certificado do servidor Actual Budget, escreva 'SKIP' para ignorar a validação do certificado",
+          "currency": "A moeda do servidor/ficheiro Actual Budget"
         }
       }
     },
     "error": {
-      "failed_to_connect": "Ligação falhou",
-      "failed_cert": "Certificado inválido",
-      "failed_file": "Ficheiro inválido",
-      "failed_unknown": "Falha desconhecida"
+      "failed_connection": "Ligação falhou",
+      "failed_ssl": "Ligação falhou: erro de certificado",
+      "failed_file": "Ligação falhou: ID de ficheiro inválido",
+      "failed_auth": "Ligação falhou: erro de autenticação",
+      "failed_unknown": "Ligação falhou: erro desconhecido"
     },
     "abort": {
       "already_configured": "Já configurado"
+    }
+  },
+  "entity": {
+    "sensor": {
+      "uncategorized_transactions": {
+        "name": "Transações não categorizadas"
+      }
+    }
+  },
+  "services": {
+    "get_transactions": {
+      "name": "Obter transações",
+      "description": "Obter todas as transações do Actual Budget"
+    },
+    "create_splits": {
+      "name": "Criar divisões",
+      "description": "Criar divisões de transação no Actual Budget"
+    },
+    "get_accounts": {
+      "name": "Obter contas",
+      "description": "Obter todas as contas do Actual Budget"
+    },
+    "bank_sync": {
+      "name": "Sincronização bancária",
+      "description": "Sincronizar todas as contas com o banco"
     }
   }
 }

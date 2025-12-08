@@ -1,36 +1,62 @@
 {
-  "title": "actualbudget",
+  "title": "Actual Budget",
   "config": {
     "step": {
       "user": {
         "title": "Login",
-        "description": "Login to actualbudget",
+        "description": "Login to Actual Budget",
         "data": {
-          "endpoint": "actualbudget endpoint",
-          "password": "password",
-          "encrypt_password": "encrypt password",
-          "file": "file id",
-          "cert": "certificate",
-          "unit": "unit"
+          "endpoint": "Actual Budget endpoint",
+          "password": "Password",
+          "encrypt_password": "Encryption password",
+          "file": "File ID",
+          "cert": "Certificate",
+          "currency": "Currency"
         },
         "data_description": {
-          "endpoint": "The endpoint of the actualbudget server",
-          "password": "The password of the actualbudget server",
-          "encrypt_password": "The password to encrypt the actualbudget file",
-          "file": "The file id of the actualbudget server",
-          "cert": "The certificate of the actualbudget server, write 'SKIP' to skip certificate validation",
-          "unit": "The currency of the actualbudget server"
+          "endpoint": "The endpoint of the Actual Budget server",
+          "password": "The password of the Actual Budget server",
+          "encrypt_password": "The password to encrypt the Actual Budget file",
+          "file": "The file ID of the Actual Budget server",
+          "cert": "The certificate of the Actual Budget server, write 'SKIP' to skip certificate validation",
+          "currency": "The currency of the Actual Budget server"
         }
       }
     },
     "error": {
-      "failed_to_connect": "Failed to connect",
-      "failed_cert": "Failed to connect: certificate error",
-      "failed_file": "Failed to connect: invalid file id",
+      "failed_connection": "Failed to connect",
+      "failed_ssl": "Failed to connect: certificate error",
+      "failed_file": "Failed to connect: invalid file ID",
+      "failed_auth": "Failed to connect: authentication error",
       "failed_unknown": "Failed to connect: unknown error"
     },
     "abort": {
       "already_configured": "Device is already configured"
+    }
+  },
+  "entity": {
+    "sensor": {
+      "uncategorized_transactions": {
+        "name": "Uncategorized Transactions"
+      }
+    }
+  },
+  "services": {
+    "get_transactions": {
+      "name": "Get Transactions",
+      "description": "Get all transactions from Actual Budget"
+    },
+    "create_splits": {
+      "name": "Create Splits",
+      "description": "Create transaction splits in Actual Budget"
+    },
+    "get_accounts": {
+      "name": "Get Accounts",
+      "description": "Get all accounts from Actual Budget"
+    },
+    "bank_sync": {
+      "name": "Bank Sync",
+      "description": "Sync all accounts with bank"
     }
   }
 }
