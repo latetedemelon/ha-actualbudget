@@ -82,6 +82,18 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             )
 
     async def _test_connection(self, endpoint, password, file, cert, encrypt_password):
-        """Test the connection to Actual Budget."""
+        """Test the connection to Actual Budget.
+        
+        This tests the connection using actualpy library which connects directly
+        to the Actual Budget server's sync protocol.
+        
+        Args:
+            endpoint: Full URL to Actual Budget server
+            password: Server password (NOT an API key - the password set on server startup)
+            file: Budget file ID (UUID format)
+            cert: SSL certificate or False to skip validation
+            encrypt_password: Optional file encryption password
+        """
+        _LOGGER.debug("Testing connection with endpoint=%s, file=%s", endpoint, file)
         api = ActualAPI(self.hass, endpoint, password, file, cert, encrypt_password)
         return await api.test_connection()

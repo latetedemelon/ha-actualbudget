@@ -1,4 +1,25 @@
-"""Actual Budget API wrapper for Home Assistant."""
+"""Actual Budget API wrapper for Home Assistant.
+
+Connection Information:
+-----------------------
+This integration connects directly to the Actual Budget server using actualpy.
+It does NOT use the actual-http-api (jhonderson/actual-http-api) REST API wrapper.
+
+Authentication:
+- The 'password' parameter is the Actual Budget SERVER password (not an API key)
+- This is the password you set when first starting the Actual Budget server
+- It is NOT the optional file encryption password (that's separate)
+
+Connection Parameters:
+- endpoint: Full URL to Actual Budget server (e.g., https://actual.example.com or http://localhost:5006)
+- password: Server password for authentication
+- file: The budget file ID (UUID format, found in Actual Budget web interface)
+- cert: SSL certificate path, or False/'SKIP' to skip certificate validation
+- encrypt_password: Optional file encryption password (if the budget file is encrypted)
+
+The actualpy library (https://github.com/bvanelli/actualpy) handles the low-level
+communication with the Actual Budget server's sync protocol.
+"""
 
 from __future__ import annotations
 
@@ -115,8 +136,14 @@ class ActualAPI:
 
     def _create_session(self):
         """Create a new Actual session."""
+        _LOGGER.debug("Creating new Actual session...")
+        
         # Use file ID for data directory to support multiple files
         data_dir = self.hass.config.path("actualbudget", self.file)
+        _LOGGER.debug("Data directory: %s", data_dir)
+        
+        _LOGGER.debug("Initializing Actual client with base_url=%s, file=%s", 
+                     self.endpoint, self.file)
         
         actual = Actual(
             base_url=self.endpoint,
@@ -126,10 +153,18 @@ class ActualAPI:
             file=self.file,
             data_dir=data_dir,
         )
+        
+        _LOGGER.debug("Entering Actual context manager...")
         actual.__enter__()
+        
+        _LOGGER.debug("Validating session...")
         result = actual.validate()
+        
         if not result.data.validated:
+            _LOGGER.error("Session validation failed - server rejected the credentials")
             raise Exception("Session not validated")
+        
+        _LOGGER.info("Session created and validated successfully")
         return actual
 
     async def sync(self) -> None:
@@ -280,29 +315,58 @@ class ActualAPI:
 
     def _test_connection(self):
         """Test the connection to Actual Budget (synchronous)."""
+        _LOGGER.info("Starting connection test to Actual Budget")
+        _LOGGER.debug("Connection parameters - Endpoint: %s, File ID: %s, Cert: %s, Encryption: %s", 
+                     self.endpoint, self.file, 
+                     "configured" if self.cert else "none",
+                     "enabled" if self.encrypt_password else "disabled")
+        
         try:
+            _LOGGER.debug("Attempting to create/get session...")
             session = self.get_session()
+            
             if not session:
+                _LOGGER.error("Session creation failed - no session returned")
                 return "failed_file"
+            
+            _LOGGER.info("Connection test successful - session established")
+            return None
+            
         except SSLError as e:
-            _LOGGER.error("SSL error during connection test: %s", e)
+            _LOGGER.error("SSL/Certificate error during connection test")
+            _LOGGER.error("SSL error details: %s", str(e))
+            _LOGGER.error("Check that the certificate is valid or use 'SKIP' to bypass certificate validation")
             return "failed_ssl"
         except ConnectionError as e:
-            _LOGGER.error("Connection error during test: %s", e)
+            _LOGGER.error("Network connection error during test")
+            _LOGGER.error("Connection error details: %s", str(e))
+            _LOGGER.error("Verify that the endpoint URL is correct and the server is accessible")
             return "failed_connection"
         except AuthorizationError as e:
-            _LOGGER.error("Authorization error during test: %s", e)
+            _LOGGER.error("Authorization failed - incorrect password")
+            _LOGGER.error("Authorization error details: %s", str(e))
+            _LOGGER.error("The password provided does not match the server password")
+            _LOGGER.info("Note: This is the server password, NOT an API key")
             return "failed_auth"
         except UnknownFileId as e:
-            _LOGGER.error("Unknown file ID error: %s", e)
+            _LOGGER.error("Unknown file ID - the specified file does not exist on the server")
+            _LOGGER.error("File ID error details: %s", str(e))
+            _LOGGER.error("File ID provided: %s", self.file)
+            _LOGGER.error("Please verify the file ID is correct in your Actual Budget server")
             return "failed_file"
         except InvalidFile as e:
-            _LOGGER.error("Invalid file error: %s", e)
+            _LOGGER.error("Invalid file - the file exists but cannot be opened")
+            _LOGGER.error("Invalid file details: %s", str(e))
+            _LOGGER.error("This may indicate file corruption or incorrect encryption password")
             return "failed_file"
         except InvalidZipFile as e:
-            _LOGGER.error("Invalid zip file error: %s", e)
+            _LOGGER.error("Invalid zip file - the budget file is corrupted")
+            _LOGGER.error("Zip file error details: %s", str(e))
+            _LOGGER.error("The budget file may need to be repaired or restored from backup")
             return "failed_file"
         except Exception as e:
-            _LOGGER.exception("Unexpected error during connection test: %s", e)
+            _LOGGER.exception("Unexpected error during connection test")
+            _LOGGER.error("Error type: %s", type(e).__name__)
+            _LOGGER.error("Error details: %s", str(e))
+            _LOGGER.error("Full traceback logged above")
             return "failed_unknown"
-        return None

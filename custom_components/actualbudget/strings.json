@@ -14,12 +14,12 @@
           "currency": "Currency"
         },
         "data_description": {
-          "endpoint": "The endpoint of the Actual Budget server",
-          "password": "The password of the Actual Budget server",
-          "encrypt_password": "The password to encrypt the Actual Budget file",
-          "file": "The file ID of the Actual Budget server",
-          "cert": "The certificate of the Actual Budget server, write 'SKIP' to skip certificate validation",
-          "currency": "The currency of the Actual Budget server"
+          "endpoint": "The endpoint of the Actual Budget server (e.g., http://localhost:5006 or https://actual.example.com)",
+          "password": "The server password (set when starting Actual Budget server, NOT an API key)",
+          "encrypt_password": "Optional: The password to decrypt the budget file (if file encryption is enabled)",
+          "file": "The budget file ID (UUID format, found in Actual Budget web interface)",
+          "cert": "SSL certificate path, or write 'SKIP' to skip certificate validation for self-signed certificates",
+          "currency": "The currency symbol to use for sensors (e.g., $, €, £)"
         }
       }
     },
