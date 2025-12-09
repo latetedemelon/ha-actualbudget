@@ -17,7 +17,7 @@ from .const import (
     CONFIG_ENCRYPT_PASSWORD,
 )
 
-__version__ = "3.1.1"
+__version__ = "3.1.2"
 _LOGGER = logging.getLogger(__name__)
 
 PLATFORMS: list[str] = ["sensor"]
