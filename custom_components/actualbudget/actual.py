@@ -284,16 +284,25 @@ class ActualAPI:
             session = self.get_session()
             if not session:
                 return "failed_file"
-        except SSLError:
+        except SSLError as e:
+            _LOGGER.error("SSL error during connection test: %s", e)
             return "failed_ssl"
-        except ConnectionError:
+        except ConnectionError as e:
+            _LOGGER.error("Connection error during test: %s", e)
             return "failed_connection"
-        except AuthorizationError:
+        except AuthorizationError as e:
+            _LOGGER.error("Authorization error during test: %s", e)
             return "failed_auth"
-        except UnknownFileId:
+        except UnknownFileId as e:
+            _LOGGER.error("Unknown file ID error: %s", e)
             return "failed_file"
-        except InvalidFile:
+        except InvalidFile as e:
+            _LOGGER.error("Invalid file error: %s", e)
             return "failed_file"
-        except InvalidZipFile:
+        except InvalidZipFile as e:
+            _LOGGER.error("Invalid zip file error: %s", e)
             return "failed_file"
+        except Exception as e:
+            _LOGGER.exception("Unexpected error during connection test: %s", e)
+            return "failed_unknown"
         return None
