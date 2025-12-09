@@ -9,7 +9,7 @@ from homeassistant.helpers.typing import ConfigType
 
 from .const import DOMAIN
 
-__version__ = "1.1.0"
+__version__ = "3.1.2"
 _LOGGER = logging.getLogger(__name__)
 _LOGGER.setLevel(logging.DEBUG)
 
