@@ -1,36 +1,62 @@
 {
-  "title": "actualbudget",
+  "title": "Actual Budget",
   "config": {
     "step": {
       "user": {
         "title": "Login",
-        "description": "Login til actualbudget",
+        "description": "Login til Actual Budget",
         "data": {
-          "endpoint": "actualbudget adresse",
-          "password": "password",
-          "encrypt_password": "krypteringspassword",
-          "file": "fil-id",
-          "cert": "certifikat",
-          "unit": "Enhed"
+          "endpoint": "Actual Budget adresse",
+          "password": "Adgangskode",
+          "encrypt_password": "Krypteringsadgangskode",
+          "file": "Fil-ID",
+          "cert": "Certifikat",
+          "currency": "Valuta"
         },
         "data_description": {
-          "endpoint": "Adressen for actualbudget serveren",
-          "password": "Password til actualbudget serveren",
-          "encrypt_password": "Password til kryptering af actualbudget filen",
-          "file": "Fil-id for actualbudget serveren",
-          "cert": "Certifikat til actualbudget serveren. Brug 'SKIP' for at springe certifikatvalidering over",
-          "unit": "Møntfod for actualbudget serveren"
+          "endpoint": "Adressen for Actual Budget serveren",
+          "password": "Adgangskode til Actual Budget serveren",
+          "encrypt_password": "Adgangskode til kryptering af Actual Budget filen",
+          "file": "Fil-ID for Actual Budget serveren",
+          "cert": "Certifikat til Actual Budget serveren. Brug 'SKIP' for at springe certifikatvalidering over",
+          "currency": "Valuta for Actual Budget serveren"
         }
       }
     },
     "error": {
-      "failed_to_connect": "Forbindelsen fejlede",
-      "failed_cert": "Forbindelsen fejlede: Fejl med certifikat",
-      "failed_file": "Forbindelsen fejlede: Ugyldigt fil-id",
+      "failed_connection": "Forbindelsen fejlede",
+      "failed_ssl": "Forbindelsen fejlede: Fejl med certifikat",
+      "failed_file": "Forbindelsen fejlede: Ugyldigt fil-ID",
+      "failed_auth": "Forbindelsen fejlede: Godkendelsesfejl",
       "failed_unknown": "Forbindelsen fejlede: Ukendt fejl"
     },
     "abort": {
       "already_configured": "Enheden er allerede sat op"
+    }
+  },
+  "entity": {
+    "sensor": {
+      "uncategorized_transactions": {
+        "name": "Ukategoriserede transaktioner"
+      }
+    }
+  },
+  "services": {
+    "get_transactions": {
+      "name": "Hent transaktioner",
+      "description": "Hent alle transaktioner fra Actual Budget"
+    },
+    "create_splits": {
+      "name": "Opret opdeling",
+      "description": "Opret transaktionsopdelinger i Actual Budget"
+    },
+    "get_accounts": {
+      "name": "Hent konti",
+      "description": "Hent alle konti fra Actual Budget"
+    },
+    "bank_sync": {
+      "name": "Banksynkronisering",
+      "description": "Synkroniser alle konti med banken"
     }
   }
 }

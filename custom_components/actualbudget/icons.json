@@ -1,0 +1,15 @@
+{
+  "entity": {
+    "sensor": {
+      "account": {
+        "default": "mdi:bank"
+      },
+      "budget": {
+        "default": "mdi:wallet"
+      },
+      "uncategorized_transactions": {
+        "default": "mdi:help-circle-outline"
+      }
+    }
+  }
+}
