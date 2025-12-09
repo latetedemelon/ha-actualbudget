@@ -311,61 +311,71 @@ class ActualAPI:
 
     async def test_connection(self):
         """Test the connection to Actual Budget."""
-        return await self.hass.async_add_executor_job(self._test_connection)
+        _LOGGER.info("test_connection called - delegating to executor")
+        try:
+            result = await self.hass.async_add_executor_job(self._test_connection)
+            _LOGGER.info("Executor job completed with result: %s", result)
+            return result
+        except Exception as e:
+            _LOGGER.exception("Exception in async_add_executor_job for test_connection")
+            _LOGGER.error("Exception type: %s", type(e).__name__)
+            _LOGGER.error("Exception details: %s", str(e))
+            return "failed_unknown"
 
     def _test_connection(self):
         """Test the connection to Actual Budget (synchronous)."""
-        _LOGGER.info("Starting connection test to Actual Budget")
-        _LOGGER.debug("Connection parameters - Endpoint: %s, File ID: %s, Cert: %s, Encryption: %s", 
-                     self.endpoint, self.file, 
-                     "configured" if self.cert else "none",
-                     "enabled" if self.encrypt_password else "disabled")
+        _LOGGER.info("=== ACTUAL BUDGET CONNECTION TEST (sync) ===")
+        _LOGGER.info("Endpoint: %s", self.endpoint)
+        _LOGGER.info("File ID: %s", self.file)
+        _LOGGER.info("Certificate: %s", "configured" if self.cert else "none/skip")
+        _LOGGER.info("Encryption: %s", "enabled" if self.encrypt_password else "disabled")
         
         try:
-            _LOGGER.debug("Attempting to create/get session...")
+            _LOGGER.info("Attempting to create/get session...")
             session = self.get_session()
             
             if not session:
                 _LOGGER.error("Session creation failed - no session returned")
                 return "failed_file"
             
-            _LOGGER.info("Connection test successful - session established")
+            _LOGGER.info("=== CONNECTION TEST SUCCESSFUL ===")
             return None
             
         except SSLError as e:
-            _LOGGER.error("SSL/Certificate error during connection test")
+            _LOGGER.error("=== SSL/Certificate ERROR ===")
             _LOGGER.error("SSL error details: %s", str(e))
             _LOGGER.error("Check that the certificate is valid or use 'SKIP' to bypass certificate validation")
             return "failed_ssl"
         except ConnectionError as e:
-            _LOGGER.error("Network connection error during test")
+            _LOGGER.error("=== NETWORK CONNECTION ERROR ===")
             _LOGGER.error("Connection error details: %s", str(e))
             _LOGGER.error("Verify that the endpoint URL is correct and the server is accessible")
+            _LOGGER.error("Common issues: Wrong URL, server not running, firewall blocking connection")
             return "failed_connection"
         except AuthorizationError as e:
-            _LOGGER.error("Authorization failed - incorrect password")
+            _LOGGER.error("=== AUTHORIZATION FAILED ===")
             _LOGGER.error("Authorization error details: %s", str(e))
             _LOGGER.error("The password provided does not match the server password")
             _LOGGER.info("Note: This is the server password, NOT an API key")
             return "failed_auth"
         except UnknownFileId as e:
-            _LOGGER.error("Unknown file ID - the specified file does not exist on the server")
+            _LOGGER.error("=== UNKNOWN FILE ID ===")
             _LOGGER.error("File ID error details: %s", str(e))
             _LOGGER.error("File ID provided: %s", self.file)
             _LOGGER.error("Please verify the file ID is correct in your Actual Budget server")
             return "failed_file"
         except InvalidFile as e:
-            _LOGGER.error("Invalid file - the file exists but cannot be opened")
+            _LOGGER.error("=== INVALID FILE ===")
             _LOGGER.error("Invalid file details: %s", str(e))
             _LOGGER.error("This may indicate file corruption or incorrect encryption password")
             return "failed_file"
         except InvalidZipFile as e:
-            _LOGGER.error("Invalid zip file - the budget file is corrupted")
+            _LOGGER.error("=== INVALID ZIP FILE ===")
             _LOGGER.error("Zip file error details: %s", str(e))
             _LOGGER.error("The budget file may need to be repaired or restored from backup")
             return "failed_file"
         except Exception as e:
-            _LOGGER.exception("Unexpected error during connection test")
+            _LOGGER.exception("=== UNEXPECTED ERROR ===")
             _LOGGER.error("Error type: %s", type(e).__name__)
             _LOGGER.error("Error details: %s", str(e))
             _LOGGER.error("Full traceback logged above")
