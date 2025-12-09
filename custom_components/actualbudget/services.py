@@ -27,51 +27,55 @@ SCHEMA_GET_ACCOUNTS = vol.Schema({})
 SCHEMA_BANK_SYNC = vol.Schema({})
 
 
+def _get_api_instance(hass: HomeAssistant) -> ActualAPI | None:
+    """Get the first available API instance."""
+    if DOMAIN not in hass.data or not hass.data[DOMAIN]:
+        return None
+    return list(hass.data[DOMAIN].values())[0]
+
+
 async def async_setup_services(hass: HomeAssistant) -> None:
     """Set up services for Actual Budget integration."""
 
     async def handle_get_transactions(call: ServiceCall) -> dict[str, Any]:
         """Handle the get_transactions service call."""
-        # Get the API instance from the first config entry
-        # In a real implementation, you'd want to specify which instance
-        if DOMAIN not in hass.data or not hass.data[DOMAIN]:
+        api = _get_api_instance(hass)
+        if not api:
             _LOGGER.error("No Actual Budget instances configured")
             return {"error": "No instances configured"}
 
-        api: ActualAPI = list(hass.data[DOMAIN].values())[0]
-        
         try:
-            # This would need proper implementation in actual.py
-            _LOGGER.info("Getting transactions")
-            return {"success": True}
+            # TODO: Implement get_transactions in actual.py
+            # This would need methods to retrieve and return transaction data
+            _LOGGER.warning("get_transactions service is not yet fully implemented")
+            return {"success": True, "message": "Service placeholder - not yet implemented"}
         except Exception as e:
             _LOGGER.error("Error getting transactions: %s", e)
             return {"error": str(e)}
 
     async def handle_create_splits(call: ServiceCall) -> dict[str, Any]:
         """Handle the create_splits service call."""
-        if DOMAIN not in hass.data or not hass.data[DOMAIN]:
+        api = _get_api_instance(hass)
+        if not api:
             _LOGGER.error("No Actual Budget instances configured")
             return {"error": "No instances configured"}
 
-        api: ActualAPI = list(hass.data[DOMAIN].values())[0]
-        
         try:
-            # This would need proper implementation in actual.py
-            _LOGGER.info("Creating splits")
-            return {"success": True}
+            # TODO: Implement create_splits in actual.py
+            # This would need methods to create transaction splits
+            _LOGGER.warning("create_splits service is not yet fully implemented")
+            return {"success": True, "message": "Service placeholder - not yet implemented"}
         except Exception as e:
             _LOGGER.error("Error creating splits: %s", e)
             return {"error": str(e)}
 
     async def handle_get_accounts(call: ServiceCall) -> dict[str, Any]:
         """Handle the get_accounts service call."""
-        if DOMAIN not in hass.data or not hass.data[DOMAIN]:
+        api = _get_api_instance(hass)
+        if not api:
             _LOGGER.error("No Actual Budget instances configured")
             return {"error": "No instances configured"}
 
-        api: ActualAPI = list(hass.data[DOMAIN].values())[0]
-        
         try:
             accounts = await api.get_accounts()
             return {
@@ -90,12 +94,11 @@ async def async_setup_services(hass: HomeAssistant) -> None:
 
     async def handle_bank_sync(call: ServiceCall) -> dict[str, Any]:
         """Handle the bank_sync service call."""
-        if DOMAIN not in hass.data or not hass.data[DOMAIN]:
+        api = _get_api_instance(hass)
+        if not api:
             _LOGGER.error("No Actual Budget instances configured")
             return {"error": "No instances configured"}
 
-        api: ActualAPI = list(hass.data[DOMAIN].values())[0]
-        
         try:
             await api.sync()
             _LOGGER.info("Bank sync completed successfully")
